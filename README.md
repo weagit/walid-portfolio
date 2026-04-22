@@ -3,7 +3,7 @@
 Personal portfolio site. Six-chapter scroll narrative covering background,
 projects, experience and toolkit.
 
-**Live:** _(to be added after Vercel deploy)_
+**Live:** https://walid-portfolio-nu.vercel.app
 
 ## Stack
 
