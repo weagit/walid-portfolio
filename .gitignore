@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local editor/tool settings
+.claude/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Agent / assistant instruction files (local only)
+CLAUDE.md
+AGENTS.md
