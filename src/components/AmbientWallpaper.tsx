@@ -16,7 +16,7 @@ export default function AmbientWallpaper() {
     >
       {/* Drifting orb — top left, cool silver */}
       <motion.div
-        className="absolute rounded-full blur-[110px]"
+        className="absolute rounded-full blur-[80px] will-change-transform"
         style={{
           top: "-10%",
           left: "-10%",
@@ -34,7 +34,7 @@ export default function AmbientWallpaper() {
 
       {/* Drifting orb — bottom right, warm */}
       <motion.div
-        className="absolute rounded-full blur-[130px]"
+        className="absolute rounded-full blur-[90px] will-change-transform"
         style={{
           right: "-15%",
           bottom: "-15%",
@@ -52,7 +52,7 @@ export default function AmbientWallpaper() {
 
       {/* Drifting orb — center, violet accent */}
       <motion.div
-        className="absolute rounded-full blur-[150px]"
+        className="absolute rounded-full blur-[100px] will-change-transform"
         style={{
           left: "25%",
           top: "30%",

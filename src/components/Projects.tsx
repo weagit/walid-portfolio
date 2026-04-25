@@ -73,9 +73,9 @@ export default function Projects() {
 
         <motion.p
           variants={fadeUp}
-          className="mt-16 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-muted/70"
+          className="mt-16 text-center font-mono text-[11px] uppercase tracking-[0.3em] text-text/80"
         >
-          pick a chapter · click to step inside
+          Pick a chapter · click a card to step inside
         </motion.p>
       </motion.div>
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -13,6 +14,12 @@ type Props = {
 };
 
 export default function Lightbox({ images, index, onClose, onIndexChange, accent }: Props) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (index === null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -24,7 +31,9 @@ export default function Lightbox({ images, index, onClose, onIndexChange, accent
     return () => document.removeEventListener("keydown", onKey);
   }, [index, images.length, onClose, onIndexChange]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {index !== null && (
         <motion.div
@@ -33,20 +42,25 @@ export default function Lightbox({ images, index, onClose, onIndexChange, accent
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           onClick={onClose}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/92 backdrop-blur-sm p-4 md:p-10"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black p-4 md:p-10"
         >
-          {/* Close */}
+          {/* Close — explicit pill button */}
           <button
-            onClick={onClose}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
             aria-label="Close"
-            className="absolute top-6 right-6 z-10 font-[family-name:var(--font-display)] tracking-[0.3em] text-xs uppercase text-muted hover:text-heading transition-colors flex items-center gap-2"
+            className="absolute top-5 right-5 z-10 font-[family-name:var(--font-display)] tracking-[0.25em] text-xs uppercase flex items-center gap-3 px-4 py-2.5 md:px-5 md:py-3 border-2 bg-bg/70 backdrop-blur-md transition-all hover:bg-bg hover:scale-[1.03]"
+            style={{ borderColor: accent, color: accent }}
           >
-            Close <span className="text-lg">×</span>
+            <span className="text-lg leading-none -mt-px">×</span>
+            <span>Close</span>
           </button>
 
           {/* Counter */}
           <div
-            className="absolute top-6 left-6 z-10 font-mono text-xs tracking-[0.3em]"
+            className="absolute top-6 left-6 z-10 font-mono text-xs tracking-[0.3em] px-3 py-1.5 border border-border-strong bg-bg/60 backdrop-blur-sm"
             style={{ color: accent }}
           >
             {String(index + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
@@ -59,7 +73,7 @@ export default function Lightbox({ images, index, onClose, onIndexChange, accent
               onIndexChange((index - 1 + images.length) % images.length);
             }}
             aria-label="Previous image"
-            className="absolute left-2 md:left-8 z-10 w-12 h-12 flex items-center justify-center text-2xl text-muted hover:text-heading hover:scale-110 transition-all"
+            className="absolute left-2 md:left-6 z-10 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-3xl text-heading bg-bg/70 backdrop-blur-md border-2 border-border-strong hover:border-heading hover:scale-110 transition-all"
           >
             ‹
           </button>
@@ -71,7 +85,7 @@ export default function Lightbox({ images, index, onClose, onIndexChange, accent
               onIndexChange((index + 1) % images.length);
             }}
             aria-label="Next image"
-            className="absolute right-2 md:right-8 z-10 w-12 h-12 flex items-center justify-center text-2xl text-muted hover:text-heading hover:scale-110 transition-all"
+            className="absolute right-2 md:right-6 z-10 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center text-3xl text-heading bg-bg/70 backdrop-blur-md border-2 border-border-strong hover:border-heading hover:scale-110 transition-all"
           >
             ›
           </button>
@@ -97,6 +111,7 @@ export default function Lightbox({ images, index, onClose, onIndexChange, accent
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

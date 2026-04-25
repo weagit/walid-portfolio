@@ -48,15 +48,19 @@ export default function ProjectModal({
       {/* Grain to match site */}
       <div className="grain absolute inset-0 pointer-events-none" aria-hidden />
 
-      {/* Close */}
+      {/* Close — explicit, accent-bordered button so visitors can't miss it */}
       <button
         onClick={onClose}
         aria-label="Close project"
-        className="fixed top-6 right-6 md:top-10 md:right-10 z-10 font-[family-name:var(--font-display)] tracking-[0.3em] text-xs uppercase text-muted hover:text-heading transition-colors flex items-center gap-3 group"
+        className="fixed top-5 right-5 md:top-8 md:right-8 z-20 font-[family-name:var(--font-display)] tracking-[0.25em] text-xs uppercase text-heading bg-bg/70 backdrop-blur-md flex items-center gap-3 px-4 py-2.5 md:px-5 md:py-3 border-2 transition-all hover:bg-bg hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        style={{
+          borderColor: mood.accent,
+          color: mood.accent,
+          ["--tw-ring-color" as string]: mood.accent,
+        }}
       >
+        <span className="text-lg leading-none -mt-px">×</span>
         <span>Close</span>
-        <span className="h-px w-8 bg-border-strong group-hover:w-12 transition-all" />
-        <span className="text-lg leading-none">×</span>
       </button>
 
       {/* Content */}

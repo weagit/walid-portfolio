@@ -21,8 +21,10 @@ type Props = {
 export default function ProjectGallery({ images, aspect, accent, title }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
+  const [visible, setVisible] = useState(true);
   const x = useMotionValue(0);
   const trackRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const contentWidth = useRef(0);
 
   // Duplicate images for seamless loop
@@ -34,8 +36,20 @@ export default function ProjectGallery({ images, aspect, accent, title }: Props)
     }
   }, [images]);
 
+  // Pause animation when gallery is offscreen — saves CPU on long pages
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: "200px" }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
   useAnimationFrame((_, delta) => {
-    if (paused || lightboxIndex !== null) return;
+    if (paused || !visible || lightboxIndex !== null) return;
     const speed = aspect === "landscape" ? 30 : 22; // px/sec
     const next = x.get() - (speed * delta) / 1000;
     // Reset when we've moved one full content width
@@ -54,6 +68,7 @@ export default function ProjectGallery({ images, aspect, accent, title }: Props)
   return (
     <>
       <div
+        ref={containerRef}
         className="relative overflow-hidden -mx-8 md:-mx-16 px-8 md:px-16 cursor-grab active:cursor-grabbing"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
@@ -103,10 +118,10 @@ export default function ProjectGallery({ images, aspect, accent, title }: Props)
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                   style={{ boxShadow: `inset 0 0 0 1.5px ${accent}` }}
                 />
-                {/* Zoom cue */}
+                {/* Zoom cue — always visible, brighter on hover */}
                 <div
                   aria-hidden
-                  className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-mono text-[10px] uppercase tracking-[0.2em] px-2 py-1 bg-bg/80 backdrop-blur-sm"
+                  className="absolute bottom-2 right-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300 font-mono text-[10px] uppercase tracking-[0.2em] px-2 py-1 bg-bg/85 backdrop-blur-sm border border-border-strong"
                   style={{ color: accent }}
                 >
                   ⤢ View
@@ -117,8 +132,9 @@ export default function ProjectGallery({ images, aspect, accent, title }: Props)
         </motion.div>
       </div>
 
-      <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.3em] text-muted/60">
-        drag · hover pauses · click to zoom
+      <div className="mt-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.3em] text-text/75">
+        <span aria-hidden style={{ color: accent }}>⤢</span>
+        <span>Click any image to zoom · drag to scroll · hover pauses</span>
       </div>
 
       <Lightbox

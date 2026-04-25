@@ -16,7 +16,7 @@
   --color-border-strong: #3A3A3E;
 
   /* Text */
-  --color-muted: #7A7A7A;
+  --color-muted: #9CA0A6;
   --color-text: #F5F5F5;
   --color-heading: #FFFFFF;
 
@@ -64,6 +64,18 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #3A3A3E;
+}
+
+/* Reduced motion — respect users who disabled animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Grain texture utility — adds subtle film grain for depth */

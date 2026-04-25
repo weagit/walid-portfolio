@@ -131,7 +131,7 @@ function ToolColumn({
                 {item.name}
               </span>
               {item.note && (
-                <span className="font-mono text-[11px] text-muted">
+                <span className="font-mono text-[11px] text-text/75">
                   — {item.note}
                 </span>
               )}

@@ -35,12 +35,12 @@ export default function StatueLayer() {
     [1, 0.82, 0.76, 0.72, 0.8, 0.78, 0.72]
   );
 
-  // Right-side x = 15% → with flip, the statue body lands in the right third
-  // of the viewport (not off-screen). Chill & centered on that half.
+  // Right-side x — pushed further right so the statue clearly anchors the
+  // right edge during Journey + Toolkit, not creeping into the text column.
   const x = useTransform(
     smooth,
     [0, 900, 1700, 1900, 2100, 5400, 6400],
-    ["0%", "-10%", "-18%", "-18%", "15%", "16%", "18%"]
+    ["0%", "-10%", "-18%", "-18%", "30%", "32%", "34%"]
   );
 
   // Steady opacity through Journey + Toolkit — no flickering fade mid-read.
