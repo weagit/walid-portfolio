@@ -23,6 +23,8 @@ export type Project = {
   highlights: readonly string[];
   links: readonly { label: string; href: string }[];
   preview?: string; // hero image path
+  tileFocus?: "top" | "center" | "bottom"; // where to bias the crop
+  fallbackTile?: "architecture" | "arena" | "fresh"; // synthetic tile when no image
   gallery?: readonly string[];
   galleryAspect?: "portrait" | "landscape"; // screenshot orientation
   schema?: {
@@ -58,6 +60,7 @@ export const projects: readonly Project[] = [
     ],
     links: [{ label: "GitHub", href: "https://github.com/weagit/LosWakers" }],
     preview: "/images/loswakers/image.png",
+    tileFocus: "center",
     gallery: [
       "/images/loswakers/image.png",
       "/images/loswakers/image1.png",
@@ -131,6 +134,7 @@ export const projects: readonly Project[] = [
       ],
     },
     links: [],
+    fallbackTile: "architecture",
     mood: {
       label: "Architecture",
       accent: "#A3B8C9",
@@ -158,6 +162,7 @@ export const projects: readonly Project[] = [
     ],
     links: [],
     preview: "/images/nutrisnap/IMG_4370.png",
+    tileFocus: "top",
     gallery: [
       "/images/nutrisnap/IMG_4370.png",
       "/images/nutrisnap/IMG_4372.png",
