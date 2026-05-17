@@ -65,7 +65,7 @@ export default function MicroservicesSchema({
               <polygon points="98,2 110,7 98,12" fill={accent} />
             </svg>
             <span
-              className="font-mono text-[9px] tracking-[0.2em] text-muted/70 whitespace-nowrap"
+              className="font-mono text-[9px] tracking-[0.2em] text-muted whitespace-nowrap"
               aria-hidden
             >
               synchronous
@@ -109,7 +109,7 @@ export default function MicroservicesSchema({
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted mb-3">
             Key cross-service calls
           </div>
-          <ul className="grid md:grid-cols-2 gap-x-6 gap-y-2 font-mono text-xs text-text/80">
+          <ul className="grid md:grid-cols-2 gap-x-6 gap-y-2 font-mono text-xs text-text">
             {schema.restCalls.map((call) => (
               <li key={call} className="flex gap-2">
                 <span style={{ color: accent }}>→</span>

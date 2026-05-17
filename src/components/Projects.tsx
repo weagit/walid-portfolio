@@ -1,33 +1,27 @@
 "use client";
 
-import { useState, useMemo } from "react";
+/**
+ * Projects — Chapter III. Fanned card picker with continuous left-right drift.
+ *
+ * The whole row sways slowly on a sine cycle (right → left → right → …) so
+ * the picker feels alive even when the visitor isn't touching it. Hovering
+ * a card pauses the drift, lifts the card forward, and dims the neighbors.
+ * Clicking opens the existing ProjectModal.
+ */
+
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { projects, projectsChapter, type Project } from "@/data/projects";
+import { projects, projectsChapterContent, type Project } from "@/data/projects";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 import ProjectModal from "./ProjectModal";
-import InfiniteMenu, { type InfiniteMenuItem } from "./InfiniteMenu";
+import ProjectTexture from "./ProjectTexture";
+import { useLocale } from "@/lib/i18n";
 
 export default function Projects() {
+  const locale = useLocale();
+  const projectsChapter = projectsChapterContent[locale];
   const [active, setActive] = useState<Project | null>(null);
-
-  // Build the InfiniteMenu items — each project becomes a tile on the sphere.
-  // The sphere has many faces, but only project items are clickable; the
-  // shader tiles textures by `instanceId % itemCount` so 3 projects fill
-  // every face. Clicking the action button opens the existing modal.
-  const items: InfiniteMenuItem[] = useMemo(
-    () =>
-      projects.map((p) => ({
-        image: p.preview,
-        title: p.title,
-        description: p.tagline,
-        index: p.index,
-        accent: p.mood.accent,
-        tileFocus: p.tileFocus ?? "center",
-        fallback: p.fallbackTile,
-        onSelect: () => setActive(p),
-      })),
-    []
-  );
+  const [hovered, setHovered] = useState<string | null>(null);
 
   return (
     <section
@@ -43,7 +37,7 @@ export default function Projects() {
       >
         {/* Chapter marker */}
         <motion.div variants={fadeUp} className="flex items-center gap-4 mb-8">
-          <span className="font-[family-name:var(--font-display)] text-accent text-base tracking-[0.3em]">
+          <span className="font-[family-name:var(--font-display)] text-accent-hover text-base tracking-[0.3em]">
             {projectsChapter.chapter}
           </span>
           <motion.span
@@ -64,18 +58,39 @@ export default function Projects() {
 
         <motion.p
           variants={fadeUp}
-          className="mt-6 text-muted text-base md:text-lg max-w-xl"
+          className="mt-6 text-text text-base md:text-lg max-w-xl"
         >
           {projectsChapter.sub}
         </motion.p>
 
-        {/* Infinite-menu sphere — left = info panel, right = spinning sphere */}
+        {/* Fanned cards — the whole row sways left/right on a slow loop */}
         <motion.div
           variants={fadeUp}
-          className="mt-12 md:mt-16 w-full h-[520px] md:h-[600px] lg:h-[640px]"
+          className="mt-20 md:mt-28 flex flex-col md:flex-row md:justify-center md:items-end gap-6 md:gap-0 md:-space-x-12 lg:-space-x-16 perspective-[1200px]"
+          onMouseLeave={() => setHovered(null)}
         >
-          <InfiniteMenu items={items} scale={3} />
+          {projects.map((p, i) => (
+            <ChoiceCard
+              key={p.id}
+              project={p}
+              index={i}
+              total={projects.length}
+              isHovered={hovered === p.id}
+              anyHovered={hovered !== null}
+              onHover={() => setHovered(p.id)}
+              onOpen={() => setActive(p)}
+              t={p.i18n[locale]}
+              stepInside={projectsChapter.stepInside}
+            />
+          ))}
         </motion.div>
+
+        <motion.p
+          variants={fadeUp}
+          className="mt-16 text-center font-mono text-[11px] uppercase tracking-[0.3em] text-text"
+        >
+          {projectsChapter.pickHint}
+        </motion.p>
       </motion.div>
 
       <AnimatePresence>
@@ -84,5 +99,144 @@ export default function Projects() {
         )}
       </AnimatePresence>
     </section>
+  );
+}
+
+function ChoiceCard({
+  project,
+  index,
+  total,
+  isHovered,
+  anyHovered,
+  onHover,
+  onOpen,
+  t,
+  stepInside,
+}: {
+  project: Project;
+  index: number;
+  total: number;
+  isHovered: boolean;
+  anyHovered: boolean;
+  onHover: () => void;
+  onOpen: () => void;
+  t: { title: string; tagline: string; moodLabel: string };
+  stepInside: string;
+}) {
+  // Fanned tilt — middle card straight, outer cards tilted outward
+  const center = (total - 1) / 2;
+  const offset = index - center;
+  const baseTilt = offset * 6;
+  const baseY = Math.abs(offset) * 12;
+  const baseZ = total - Math.abs(offset);
+
+  return (
+    <motion.button
+      onClick={onOpen}
+      onMouseEnter={onHover}
+      onFocus={onHover}
+      initial={false}
+      animate={{
+        rotate: isHovered ? 0 : baseTilt,
+        y: isHovered ? -28 : baseY,
+        scale: isHovered ? 1.06 : anyHovered ? 0.96 : 1,
+        opacity: anyHovered && !isHovered ? 0.55 : 1,
+      }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        zIndex: isHovered ? 10 : baseZ,
+        transformStyle: "preserve-3d",
+      }}
+      className="group relative w-full md:w-[320px] lg:w-[360px] aspect-[3/4] text-left shrink-0 cursor-pointer"
+    >
+      <div
+        className="relative w-full h-full overflow-hidden border border-border-strong shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]"
+        style={{ background: project.mood.backdrop }}
+      >
+        <div className="absolute inset-0 opacity-90">
+          <ProjectTexture mood={project.mood} />
+        </div>
+
+        <div className="grain absolute inset-0 opacity-60" aria-hidden />
+
+        {/* Accent corner ticks */}
+        <span
+          className="absolute top-3 left-3 w-3 h-3 border-t border-l"
+          style={{ borderColor: project.mood.accent }}
+        />
+        <span
+          className="absolute top-3 right-3 w-3 h-3 border-t border-r"
+          style={{ borderColor: project.mood.accent }}
+        />
+        <span
+          className="absolute bottom-3 left-3 w-3 h-3 border-b border-l"
+          style={{ borderColor: project.mood.accent }}
+        />
+        <span
+          className="absolute bottom-3 right-3 w-3 h-3 border-b border-r"
+          style={{ borderColor: project.mood.accent }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 h-full flex flex-col justify-between p-7 md:p-8">
+          <div>
+            <div
+              className="font-[family-name:var(--font-display)] text-6xl md:text-7xl leading-none"
+              style={{ color: project.mood.accent }}
+            >
+              {project.index}
+            </div>
+            <div className="mt-4 flex items-center gap-3">
+              <span
+                className="font-mono text-[10px] uppercase tracking-[0.4em]"
+                style={{ color: project.mood.accent }}
+              >
+                {t.moodLabel}
+              </span>
+              <span
+                className="h-px w-8"
+                style={{ backgroundColor: project.mood.accent, opacity: 0.6 }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-[family-name:var(--font-display)] text-heading text-3xl md:text-[2rem] leading-[1.05] tracking-[0.01em]">
+              {t.title}
+            </h3>
+            <p className="mt-3 font-[family-name:var(--font-serif)] italic text-heading text-base md:text-lg leading-snug">
+              {t.tagline}
+            </p>
+
+            <motion.div
+              className="mt-6 flex items-center gap-3 font-[family-name:var(--font-display)] text-[11px] tracking-[0.3em] uppercase overflow-hidden"
+              style={{ color: project.mood.accent }}
+            >
+              <motion.span
+                animate={{ x: isHovered ? 0 : -6, opacity: isHovered ? 1 : 0.85 }}
+                transition={{ duration: 0.3 }}
+              >
+                {stepInside}
+              </motion.span>
+              <motion.span
+                animate={{ x: isHovered ? 4 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                →
+              </motion.span>
+            </motion.div>
+          </div>
+        </div>
+
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)",
+          }}
+        />
+      </div>
+    </motion.button>
   );
 }

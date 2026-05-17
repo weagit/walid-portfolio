@@ -16,9 +16,10 @@ type Props = {
   aspect: "portrait" | "landscape";
   accent: string;
   title: string;
+  hint?: string;
 };
 
-export default function ProjectGallery({ images, aspect, accent, title }: Props) {
+export default function ProjectGallery({ images, aspect, accent, title, hint }: Props) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -132,9 +133,9 @@ export default function ProjectGallery({ images, aspect, accent, title }: Props)
         </motion.div>
       </div>
 
-      <div className="mt-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.3em] text-text/75">
+      <div className="mt-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.3em] text-text">
         <span aria-hidden style={{ color: accent }}>⤢</span>
-        <span>Click any image to zoom · drag to scroll · hover pauses</span>
+        <span>{hint ?? "Click any image to zoom · drag to scroll · hover pauses"}</span>
       </div>
 
       <Lightbox

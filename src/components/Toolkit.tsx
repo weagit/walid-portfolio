@@ -1,15 +1,15 @@
 "use client";
 
 import { motion } from "motion/react";
-import {
-  toolkit,
-  toolkitLanguages,
-  toolkitChapter,
-  type ToolGroup,
-} from "@/data/toolkit";
+import { toolkitContent, type ToolGroup } from "@/data/toolkit";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
+import { useLocale } from "@/lib/i18n";
 
 export default function Toolkit() {
+  const locale = useLocale();
+  const toolkitChapter = toolkitContent[locale];
+  const toolkit = toolkitContent[locale].groups;
+  const toolkitLanguages = toolkitContent[locale].languages;
   return (
     <section
       id="toolkit"
@@ -69,7 +69,7 @@ export default function Toolkit() {
           className="mt-20 pt-10 border-t border-border"
         >
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted mb-6">
-            Languages
+            {toolkitChapter.languagesLabel}
           </div>
           <div className="flex flex-wrap gap-x-10 gap-y-4">
             {toolkitLanguages.map((l) => (
@@ -112,7 +112,7 @@ function ToolColumn({
           {group.label}
         </h3>
       </div>
-      <p className="font-[family-name:var(--font-serif)] italic text-text/85 text-lg mb-8 max-w-md">
+      <p className="font-[family-name:var(--font-serif)] italic text-text text-lg mb-8 max-w-md">
         {group.lead}
       </p>
 
@@ -131,7 +131,7 @@ function ToolColumn({
                 {item.name}
               </span>
               {item.note && (
-                <span className="font-mono text-[11px] text-text/75">
+                <span className="font-mono text-[11px] text-muted">
                   — {item.note}
                 </span>
               )}

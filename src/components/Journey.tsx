@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "motion/react";
-import { journey, journeyChapter, type JourneyEntry } from "@/data/journey";
+import { journeyContent, type JourneyEntry } from "@/data/journey";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
+import { useLocale } from "@/lib/i18n";
 
 const tagColor: Record<JourneyEntry["tag"], string> = {
   experience: "var(--color-accent)",
@@ -11,6 +12,9 @@ const tagColor: Record<JourneyEntry["tag"], string> = {
 };
 
 export default function Journey() {
+  const locale = useLocale();
+  const journey = journeyContent[locale].entries;
+  const journeyChapter = journeyContent[locale];
   return (
     <section
       id="journey"
@@ -114,7 +118,7 @@ function TimelineItem({ entry }: { entry: JourneyEntry }) {
       <h3 className="font-[family-name:var(--font-display)] text-heading text-2xl md:text-3xl leading-[1.1] tracking-[0.01em]">
         {entry.org}
       </h3>
-      <div className="mt-1 text-text/80 text-base md:text-lg">{entry.role}</div>
+      <div className="mt-1 text-text text-base md:text-lg">{entry.role}</div>
 
       {/* Lead */}
       <p className="mt-4 font-[family-name:var(--font-serif)] italic text-text text-lg md:text-xl leading-[1.45] max-w-2xl">

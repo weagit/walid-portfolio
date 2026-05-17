@@ -3,9 +3,11 @@
 import { useEffect } from "react";
 import { motion } from "motion/react";
 import type { Project } from "@/data/projects";
+import { projectsChapterContent } from "@/data/projects";
 import ProjectTexture from "./ProjectTexture";
 import ProjectGallery from "./ProjectGallery";
 import MicroservicesSchema from "./MicroservicesSchema";
+import { useLocale } from "@/lib/i18n";
 
 /**
  * Full-viewport takeover for a project. The backdrop, accent, and animated
@@ -19,6 +21,9 @@ export default function ProjectModal({
   project: Project;
   onClose: () => void;
 }) {
+  const locale = useLocale();
+  const t = project.i18n[locale];
+  const ui = projectsChapterContent[locale];
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
@@ -35,7 +40,7 @@ export default function ProjectModal({
     <motion.div
       role="dialog"
       aria-modal="true"
-      aria-label={project.title}
+      aria-label={t.title}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -51,7 +56,7 @@ export default function ProjectModal({
       {/* Close — explicit, accent-bordered button so visitors can't miss it */}
       <button
         onClick={onClose}
-        aria-label="Close project"
+        aria-label={ui.closeLabel}
         className="fixed top-5 right-5 md:top-8 md:right-8 z-20 font-[family-name:var(--font-display)] tracking-[0.25em] text-xs uppercase text-heading bg-bg/70 backdrop-blur-md flex items-center gap-3 px-4 py-2.5 md:px-5 md:py-3 border-2 transition-all hover:bg-bg hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         style={{
           borderColor: mood.accent,
@@ -60,7 +65,7 @@ export default function ProjectModal({
         }}
       >
         <span className="text-lg leading-none -mt-px">×</span>
-        <span>Close</span>
+        <span>{ui.closeLabel}</span>
       </button>
 
       {/* Content */}
@@ -76,7 +81,7 @@ export default function ProjectModal({
             className="font-[family-name:var(--font-display)] text-xs tracking-[0.4em] uppercase"
             style={{ color: mood.accent }}
           >
-            {project.index} · {mood.label}
+            {project.index} · {t.moodLabel}
           </span>
           <span
             className="h-px w-20"
@@ -86,34 +91,34 @@ export default function ProjectModal({
 
         {/* Title */}
         <h2 className="font-[family-name:var(--font-display)] text-heading text-5xl md:text-7xl leading-[1] tracking-[0.01em]">
-          {project.title}
+          {t.title}
         </h2>
 
         {/* Tagline */}
         <p className="mt-6 font-[family-name:var(--font-serif)] italic text-2xl md:text-3xl text-heading/90 max-w-2xl leading-[1.35]">
-          {project.tagline}
+          {t.tagline}
         </p>
 
         {/* Meta row */}
         <div className="mt-10 flex flex-wrap gap-x-10 gap-y-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted">
           <div>
-            <span className="opacity-60">Year · </span>
+            <span className="opacity-80">{ui.yearLabel} · </span>
             <span className="text-text">{project.year}</span>
           </div>
           <div>
-            <span className="opacity-60">Role · </span>
-            <span className="text-text">{project.role}</span>
+            <span className="opacity-80">{ui.roleLabel} · </span>
+            <span className="text-text">{t.role}</span>
           </div>
         </div>
 
         {/* Summary */}
         <p className="mt-10 text-text text-base md:text-lg leading-relaxed max-w-2xl">
-          {project.summary}
+          {t.summary}
         </p>
 
         {/* Highlights */}
         <ul className="mt-12 space-y-4 max-w-2xl">
-          {project.highlights.map((h, i) => (
+          {t.highlights.map((h, i) => (
             <motion.li
               key={i}
               initial={{ opacity: 0, x: -12 }}
@@ -135,7 +140,7 @@ export default function ProjectModal({
         {/* Stack */}
         <div className="mt-14">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted mb-4">
-            Stack
+            {ui.stackLabel}
           </div>
           <div className="flex flex-wrap gap-2">
             {project.stack.map((s) => (
@@ -154,13 +159,14 @@ export default function ProjectModal({
         {project.gallery && project.gallery.length > 0 && (
           <div className="mt-16">
             <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted mb-2">
-              Gallery
+              {ui.galleryLabel}
             </div>
             <ProjectGallery
               images={project.gallery}
               aspect={project.galleryAspect ?? "landscape"}
               accent={mood.accent}
-              title={project.title}
+              title={t.title}
+              hint={ui.galleryHint}
             />
           </div>
         )}

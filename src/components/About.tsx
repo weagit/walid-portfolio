@@ -1,11 +1,14 @@
 "use client";
 
 import { motion } from "motion/react";
-import { about } from "@/data/about";
+import { aboutContent } from "@/data/about";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
 import ScrollRevealText from "./ScrollRevealText";
+import { useLocale } from "@/lib/i18n";
 
 export default function About() {
+  const locale = useLocale();
+  const about = aboutContent[locale];
   return (
     <section
       id="about"
@@ -75,7 +78,7 @@ export default function About() {
           className="mt-12 pt-8 border-t border-border max-w-xl"
         >
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted mb-4">
-            Languages spoken
+            {about.langsLabel}
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-2 font-[family-name:var(--font-serif)] text-accent-hover text-lg">
             {about.languages.map((lang, i) => (

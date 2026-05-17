@@ -14,19 +14,22 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useLocale, useSetLocale, type Locale } from "@/lib/i18n";
 
-type Item = { id: string; label: string };
+type Item = { id: string; en: string; fr: string };
 
 const items: readonly Item[] = [
-  { id: "hero", label: "Home" },
-  { id: "about", label: "About" },
-  { id: "projects", label: "Projects" },
-  { id: "journey", label: "Journey" },
-  { id: "toolkit", label: "Toolkit" },
-  { id: "contact", label: "Contact" },
+  { id: "hero", en: "Home", fr: "Accueil" },
+  { id: "about", en: "About", fr: "À propos" },
+  { id: "projects", en: "Projects", fr: "Projets" },
+  { id: "journey", en: "Journey", fr: "Parcours" },
+  { id: "toolkit", en: "Toolkit", fr: "Outils" },
+  { id: "contact", en: "Contact", fr: "Contact" },
 ];
 
 export default function PillNav() {
+  const locale = useLocale();
+  const setLocale = useSetLocale();
   const [active, setActive] = useState<string>("hero");
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
@@ -98,13 +101,15 @@ export default function PillNav() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -32, opacity: 0 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed top-5 left-1/2 -translate-x-1/2 z-40 hidden md:block"
+          className="fixed top-5 left-1/2 -translate-x-1/2 z-40 hidden md:flex items-center gap-2"
         >
           <ul
             className="flex items-center gap-1 px-2 py-2 rounded-full border border-border-strong bg-bg/70 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]"
             style={{ ["--ring" as string]: "var(--color-accent-hover)" }}
           >
-            {items.map(({ id, label }) => {
+            {items.map((it) => {
+              const id = it.id;
+              const label = locale === "fr" ? it.fr : it.en;
               const isActive = active === id;
               return (
                 <li key={id} className="relative">
@@ -137,8 +142,54 @@ export default function PillNav() {
               );
             })}
           </ul>
+
+          {/* Locale toggle */}
+          <div
+            className="flex items-center gap-0.5 px-1 py-1 rounded-full border border-border-strong bg-bg/70 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)]"
+            role="group"
+            aria-label="Language"
+          >
+            {(["en", "fr"] as const).map((l) => (
+              <LocalePill
+                key={l}
+                value={l}
+                active={locale === l}
+                onClick={() => setLocale(l)}
+              />
+            ))}
+          </div>
         </motion.nav>
       )}
     </AnimatePresence>
+  );
+}
+
+function LocalePill({
+  value,
+  active,
+  onClick,
+}: {
+  value: Locale;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`relative px-2.5 py-1 rounded-full text-[11px] tracking-[0.15em] font-mono uppercase transition-colors ${
+        active ? "text-heading" : "text-muted hover:text-text"
+      }`}
+    >
+      {active && (
+        <motion.span
+          layoutId="locale-active"
+          className="absolute inset-0 rounded-full border border-border-strong bg-surface-elevated/80"
+          transition={{ type: "spring", stiffness: 380, damping: 32 }}
+        />
+      )}
+      <span className="relative z-[1]">{value}</span>
+    </button>
   );
 }

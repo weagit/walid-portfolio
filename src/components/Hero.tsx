@@ -5,8 +5,11 @@ import SocialLinks from "./SocialLinks";
 import Particles from "./Particles";
 import { profile } from "@/data/profile";
 import { fadeUp, stagger } from "@/lib/motion";
+import { useLocale } from "@/lib/i18n";
 
 export default function Hero() {
+  const locale = useLocale();
+  const continueLabel = locale === "fr" ? "continuer" : "continue";
   return (
     <section
       id="hero"
@@ -82,7 +85,7 @@ export default function Hero() {
           className="flex flex-col items-center gap-3"
         >
           <span className="font-[family-name:var(--font-serif)] italic text-base md:text-lg">
-            continue
+            {continueLabel}
           </span>
           <svg
             width="28"

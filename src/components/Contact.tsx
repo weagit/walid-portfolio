@@ -2,11 +2,15 @@
 
 import { motion } from "motion/react";
 import SocialLinks from "./SocialLinks";
-import { contactChapter } from "@/data/contact";
+import { contactContent } from "@/data/contact";
 import { profile } from "@/data/profile";
 import { fadeUp, stagger, viewportOnce } from "@/lib/motion";
+import { useLocale } from "@/lib/i18n";
 
 export default function Contact() {
+  const locale = useLocale();
+  const contactChapter = contactContent[locale];
+  const location = profile.i18n[locale].location;
   return (
     <section
       id="contact"
@@ -78,10 +82,10 @@ export default function Contact() {
         >
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted mb-1">
-              Based in
+              {locale === "fr" ? "Basé en" : "Based in"}
             </div>
             <div className="font-[family-name:var(--font-serif)] text-heading text-lg">
-              {profile.location}
+              {location}
             </div>
           </div>
         </motion.div>
@@ -97,7 +101,7 @@ export default function Contact() {
         {/* Footer line — signature */}
         <motion.div
           variants={fadeUp}
-          className="mt-20 pt-6 border-t border-border flex flex-col md:flex-row md:items-center md:justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted/70"
+          className="mt-20 pt-6 border-t border-border flex flex-col md:flex-row md:items-center md:justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted"
         >
           <span>
             {profile.name.full} · {new Date().getFullYear()}
